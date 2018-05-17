@@ -1,10 +1,11 @@
 # Project-Web-Tech
 
-<h5>Define database in config.php using phpMyAdmin</h5>
+<h5>Database defined in config.php using phpMyAdmin</h5>
 <p>hostnameorservername = localhost
   <br>
   serverusername = root
   <br>
   serverpassword = 
   <br>
-  databasenamed = db_project</p>
+  databasenamed = db_project
+</p>
