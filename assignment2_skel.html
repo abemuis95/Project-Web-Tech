@@ -164,9 +164,12 @@
   <script>
     $("#odrConfirm").hide();
 
+    var url = "http://localhost/abemuis/Project-Web-Tech/";
+    //var url = "http://gmm-student.fc.utm.my/~ambnh/Project-Web-Tech/";
+
     var app = angular.module('custOdr', []);
 
-    app.controller('custOdrCtrl', function($scope) {
+    app.controller('custOdrCtrl', function($scope, $http) {
         $scope.menu = {};
         $scope.odrList = [];
         $scope.odrKeys = [];
@@ -277,8 +280,23 @@
             //   + JSON.stringify(cust, null, 1) + "\n"
             //   + JSON.stringify(odrList, null, 1));
             alert("Save the following JSON structure into database:\n"
-              + angular.toJson($scope.cust, 1) + "\n"
-              + angular.toJson($scope.odrList, 1));
+                + angular.toJson($scope.cust, 1) + "\n"
+                + angular.toJson($scope.odrList, 1));
+
+            var json = {  action : 'saveOrder',
+                          customer : cust,
+                          order : odrList
+            };
+
+            //console.log(json);
+            //console.log(JSON.stringify(json));
+            
+
+            $http.post(url + 'order.php', JSON.stringify(json)).then(function(resp) {
+              /*optional stuff to do after success */
+              //alert(resp.data);
+              $http.get(url + 'order.php?action=listOrder');
+            });
 
             // Reset all model/data referred by $scope instance
             $scope.menu = {};

@@ -1,13 +1,27 @@
 <?php
+	header("Content-type:text/plain");
+	header("Access-Control-Allow-Origin: *");
 
-	include('config.php');
+	//include('config.php');
 
-	// SQL statement to update event table of status_data to 0 if the date has pass
-	$updatedata = "UPDATE event SET status_data = 0 WHERE start_date < '" . $currentdate . "' AND (end_date < '" . $currentdate . "' OR end_date is NULL)";
-	$query1 = mysqli_query($connection, $updatedata); // Execute the sql statement
+	$jsonString = file_get_contents("php://input");
+	$jsonObject = json_decode($jsonString, true);
+	echo var_dump($jsonObject);
+	echo $students['customer']['name'];
 
-	class SaveOrder() { . . . }
-	class ListOrder() { . . . }
-	class DeleteOrder() { . . . }
+
+	function SaveOrder() {
+
+	}
+
+	function ListOrder() {
+
+	}
+	
+	// This method will delete order history in database
+	// based from the user choice
+	function DeleteOrder() {
+
+	}
 
 ?>
