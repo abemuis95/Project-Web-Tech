@@ -10,14 +10,14 @@
   databasenamed = db_project
 </p>
 
-<p>Table: customer
+<p>Table: customer<br>
   id_customer [int(11)]<br>
   name [varchar(50)]<br>
   address [varchar(50)]<br>
   area [varchar(50)]<br>
 </p>
 
-<p>Table: order
+<p>Table: order<br>
   id_order [int(11)]<br>
   id_customer [int(11)]<br>
   item [varchar(50)]<br>
