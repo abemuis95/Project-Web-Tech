@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Assignment 2</title>
+    <title>Project</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -8,8 +8,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
   <head>
 
-  <body ng-app="custOdr" ng-controller="custOdrCtrl">
-        <div class="container" id="odrForm">
+  <body ng-app="custOdr" ng-controller="custOdrCtrl" style="padding-top: 5vh;">
+    <div class="container" id="odrForm">
       <div class="row">
         <div class="col-md-6">
           <img src="menu.gif" width="500" height="487" alt="Planets" usemap="#menumap"></td>
@@ -77,6 +77,34 @@
                 </td>
               </tr>
             </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="container">
+          <div class="col-md-12">
+            <div class="table-responsive">
+              <table border="1" class="table table-striped table-bordered table-hover">
+                <tr><th colspan="5" class="table-primary">Order Save from Database</th></tr>
+                <tr>
+                  <th>Name</th>
+                  <th>Contact Address</th>
+                  <th>Order</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+
+                <!-- <tr ng-repeat="odr in odrList">
+                  <td>{{ odr.item }} - <button ng-click="doDelete(odr.item)" class="btn btn-danger btn-xs">Delete</button></td>
+                  <td style="text-align:center;"> {{ odr.price}} </td>
+                  <td style="text-align:center;"> {{ odr.qty }} </td>
+                  <td style="text-align:right;"> {{ (odr.price*odr.qty) | number:2 }} </td>
+                  <td style="text-align:center;">Delete</td>
+                </tr> -->
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -157,8 +185,6 @@
             ng-click="chooseItem('Chicken Porridge', 6.50);" >
       <area shape="rect" coords="418,430,436,446" alt="Seafood Porridge"
             ng-click="chooseItem('Seafood Porridge', 7.50);" >
-
-
     </map>
   </body>
   <script>
@@ -166,7 +192,7 @@
 
     var app = angular.module('custOdr', []);
 
-    app.controller('custOdrCtrl', function($scope) {
+    app.controller('custOdrCtrl', ['$scope', '$http', function($scope, $http) {
         $scope.menu = {};
         $scope.odrList = [];
         $scope.odrKeys = [];
@@ -232,7 +258,6 @@
                     $scope.totalPrice = $scope.totalPrice + ($scope.menu.price * $scope.menu.qty);
                 }
             }
-
         };
 
         $scope.doDelete = function(item) {
@@ -264,21 +289,40 @@
                 $("#odrForm").hide();
                 $("#odrConfirm").show();
             }
-
         };
 
         $scope.continueOrder = function() {
             // Display current form data in JSON format
 
+            console.log($scope.cust);
             console.log($scope.odrList);
+            // var cust = $scope.cust;
+            // var odrList = $scope.odrList;
             var cust = JSON.parse(angular.toJson($scope.cust));
             var odrList = JSON.parse(angular.toJson($scope.odrList));
             // alert("Save the following JSON structure into database:\n"
             //   + JSON.stringify(cust, null, 1) + "\n"
             //   + JSON.stringify(odrList, null, 1));
-            alert("Save the following JSON structure into database:\n"
-              + angular.toJson($scope.cust, 1) + "\n"
-              + angular.toJson($scope.odrList, 1));
+            // alert("Save the following JSON structure into database:\n"
+              // + angular.toJson($scope.cust, 1) + "\n"
+              // + angular.toJson($scope.odrList, 1));
+
+            var parameters = new Array(odrList);
+
+            $http({
+              method : "POST",
+              url : "http://localhost/Project-Web-Tech/order.php",
+              params : {customer:cust, orderList:parameters, function:'save'}
+            }).then(function mySuccess(response) {
+              // $scope.myWelcome = response.data;
+              console.log('mySuccess');
+              // console.log(JSON.stringify(response, null, 1));
+              alert(JSON.stringify(response, null, 1));
+            }, function myError(response) {
+              // $scope.myWelcome = response.statusText;
+              console.log('myError');
+              console.log(JSON.stringify(response, null, 1));
+            });
 
             // Reset all model/data referred by $scope instance
             $scope.menu = {};
@@ -286,6 +330,7 @@
             $scope.odrKeys = [];
             $scope.totalPrice = 0;
             $scope.cust = {};
+
 
             $("#odrConfirm").hide();
             $("#odrForm").show();
@@ -295,7 +340,7 @@
             $("#odrConfirm").hide();
             $("#odrForm").show();
         };
-    });
+    }]);
 
   </script>
 </html>
