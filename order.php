@@ -23,11 +23,11 @@
 			break;
 
 		case 'list':
-			ListOrder();
+			ListOrder($connection);
 			break;
 
 		case 'delete':
-			DeleteOrder();
+			DeleteOrder($connection);
 			break;
 		
 		default:
@@ -50,13 +50,39 @@
 			}
 			$queryinsert = mysqli_query($connection, $insertdata) or die(mysqli_error($connection));
 		}
+		// echo json_encode($queryinsert);
 	}
 
-	function ListOrder() {
+	function ListOrder($connection) {
+		$cust = array();
+		$order = array();
 
+		$datacustomers = "SELECT * FROM customers";
+		$dataorders = "SELECT * FROM orders";
+
+		$querycustomers = mysqli_query($connection, $datacustomers) or die(mysqli_error($connection));
+		$queryorders = mysqli_query($connection, $dataorders) or die(mysqli_error($connection));
+
+		if ($querycustomers->num_rows > 0 && $queryorders->num_rows > 0) {
+
+		    while($row = mysqli_fetch_object($querycustomers)) {
+		        // echo "id: " . $row->id_customer. " - Name: " . $row->name. " - Address: " . $row->address. " - Area: " . $row->area. "<br>";
+		        array_push($cust, $row);
+		    }
+
+		    while($row = mysqli_fetch_object($queryorders)) {
+		        // echo "id: " . $row->id_order. "id_customer: " . $row->id_customer. " - Item: " . $row->item. " - Price: " . $row->price. " - Qty: " . $row->qty. "<br>";
+		        array_push($order, $row);
+		    }
+
+		    $array = array();
+	        array_push($array, $cust);
+	        array_push($array, $order);
+		    echo json_encode($array);
+		}
 	}
 
-	function DeleteOrder() {
+	function DeleteOrder($connection) {
 		
 	}
 
