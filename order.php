@@ -2,6 +2,11 @@
 
 	include('config.php');
 
+	if(empty($_REQUEST["id_customer"]))
+	    $id_customer = 'FAIL FETCH ID_CUSTOMER';
+	else
+		$id_customer = $_REQUEST["id_customer"];
+
 	if(empty($_REQUEST["customer"]))
 	    $customer = 'FAIL FETCH CUSTOMER';
 	else
@@ -27,11 +32,11 @@
 			break;
 
 		case 'delete':
-			DeleteOrder($connection);
+			DeleteOrder($id_customer, $connection);
 			break;
 		
 		default:
-			# code...
+			echo "SYSTEM ERROR!";
 			break;
 	}
 
@@ -82,8 +87,14 @@
 		}
 	}
 
-	function DeleteOrder($connection) {
-		
+	function DeleteOrder($id_customer, $connection) {
+		$deletedata = "DELETE FROM customers WHERE id_customer = $id_customer";
+		$queryinsert = mysqli_query($connection, $deletedata) or die(mysqli_error($connection));
+
+		$deletedata = "DELETE FROM orders WHERE id_customer = $id_customer";
+		$queryinsert = mysqli_query($connection, $deletedata) or die(mysqli_error($connection));
+
+		// echo json_encode($id_customer);
 	}
 
 ?>

@@ -88,50 +88,46 @@
             <div class="table-responsive">
               <table border="1" class="table table-striped table-bordered table-hover">
                 <tr>
-                  <th colspan="5" class="table-primary">Order Save from Database</th>
-                  <th style="text-align:center;"><button ng-click="listOrder()" class="btn btn-primary btn-xs">Check</button></th>
+                  <th colspan="5" class="table-primary">Updated Order</th>
+                  <th style="text-align:center;"><button ng-click="listOrder()" class="btn btn-primary btn-xs">Refresh</button></th>
                 </tr>
                 <tr>
                   <th>Name</th>
                   <th>Contact Address</th>
-                  <th>Order - Quantity</th>
-                  <th>Total</th>
-                  <th>Total Price</th>
+                  <th>Order</th>
+                  <th>Total (RM)</th>
+                  <th>Total Price (RM)</th>
                   <th>Action</th>
                 </tr>
 
-                <tr ng-repeat="cust in dbcust | orderBy: '-id_customer'">
+                <tr ng-repeat="customers in dbcust | orderBy: '-id_customer'">
 
-                  <td>{{ cust.id_customer + ' ' + cust.name }}</td>
-                  <td>{{ cust.address + ' ' + cust.area }} </td>
+                  <td>{{ customers.name }}</td>
+                  <td>{{ customers.address + ' ' + customers.area }} </td>
 
                   <td>
-                    <ul ng-repeat="order in dborder | filter: {id_customer: cust.id_customer} " style="list-style: none; padding-left: 0;">
-                      <li>[RM{{ order.price | number:2 | numberFixedLen:2 }} x {{ order.qty | numberFixedLen:2 }}] {{ order.item }}</li>
+                    <ul ng-repeat="orders in dborder | filter: {id_customer: customers.id_customer} " style="list-style: none; padding-left: 0;">
+                      <li>[x{{ orders.qty | numberFixedLen:2 }}] {{ orders.item }} (RM{{ orders.price | number:2 }})</li>
                     </ul>
                   </td>
 
-                  <td>
-                    <ul ng-repeat="order in dborder | filter: {id_customer: cust.id_customer} " style="list-style: none; padding-left: 0;">
-                      <li>RM{{(order.price*order.qty) | number:2}}</li>
+                  <td style="text-align: right;">
+                    <ul ng-repeat="orders in dborder | filter: {id_customer: customers.id_customer} " style="list-style: none; padding-left: 0;">
+                      <li>{{(orders.price*orders.qty) | number:2}}</li>
                     </ul>
                   </td>
 
-                  <td>
-                    <span ng-repeat="order in dborder | filter: {id_customer: cust.id_customer} ">
-                      {{sumPrice(order.price,order.qty)}}
-                    </span>
-                    RM{{db_total | number:2}}
-                    {{resetTotal()}}
+                  <td style="text-align: right;">
+                    {{sumPrice(customers.id_customer) | number:2}}
                   </td>
 
-                  <td style="text-align:center;"><button ng-click="" class="btn btn-danger btn-xs">Delete</button></td>
-
+                  <td style="text-align:center;"><button ng-click="deleteOrder(customers.id_customer)" class="btn btn-danger btn-xs">Delete</button></td>
                 </tr>
+
                 <tr>
-                  <td colspan="4">Total</td>
-                  <td>RM{{db_totalPrice | number:2}}</td>
-                  {{resetTotalPrice()}}
+                  <td colspan="4"><b>TOTAL (RM)</b></td>
+                  <td style="text-align: right;">{{sumTotalPrice() | number:2}}</td>
+                  <td></td>
                 </tr>
               </table>
             </div>
@@ -228,45 +224,53 @@
         $scope.odrKeys = [];
         $scope.totalPrice = 0;
 
-        $scope.db_total = 0.0;
-        $scope.db_totalPrice = 0.0;
+        $scope.dbcust = [];
+        $scope.dborder = [];
 
         //list nama member?
         $scope.listNama = [ 'ABDUL MUIS BIN HASMARULLZAKIM',
                             'AMIRUL NAIM BIN MOHD SOLONG', 
                             'MUHAMMAD AMIRUDDIN BIN MOHAMAD ROSLAM' ];
 
-        $scope.cust = {
-            "name": "Lionel Messi",
-            "address": "Block L07, Jalan Merbau, KTHO",
-            "area": "UTM"
-        };
+        // $scope.cust = {
+        //     "name": "Lionel Messi",
+        //     "address": "Block L07, Jalan Merbau, KTHO",
+        //     "area": "UTM"
+        // };
 
         $scope.areas = [
         	"Bandar Baru Kangkar Pulai",
-            "Kangkar Pulai",
-            "Pulai Emas",
-            "Pulai Flora",
-            "Pulai Indah",
-            "Sri Pulai",
-            "Sri Pulai Perdana",
-            "Sri Pulai Perdana 2",
-            "UTM"
+          "Kangkar Pulai",
+          "Pulai Emas",
+          "Pulai Flora",
+          "Pulai Indah",
+          "Sri Pulai",
+          "Sri Pulai Perdana",
+          "Sri Pulai Perdana 2",
+          "UTM"
         ];
 
-        $scope.sumPrice = function(price, qty) {
-          $scope.db_total += (parseFloat(price) * parseInt(qty));
-          $scope.db_totalPrice += $scope.db_total;
-          // console.log(price);
-          // console.log($scope.total);
+        $scope.sumPrice = function(id_customer) {
+          var order = new Object();
+          var total = 0;
+          for(var i = 0; i < $scope.dborder.length; i++) {
+            if($scope.dborder[i].id_customer === id_customer) {
+              order = $scope.dborder[i];
+              total += (order.price * order.qty);
+            }
+          }
+          return total;
         }
 
-        $scope.resetTotal = function() {
-          $scope.db_total = 0.0;
-        }
-
-        $scope.resetTotalPrice = function() {
-          $scope.db_totalPrice = 0.0;
+        $scope.sumTotalPrice = function() {
+          var order = new Object();
+          var totalPrice = 0;
+          if($scope.dborder != null)
+          for(var i = 0; i < $scope.dborder.length; i++) {
+              order = $scope.dborder[i];
+              totalPrice += (order.price * order.qty);
+          }
+          return totalPrice;
         }
 
         $scope.chooseItem = function(item, price) {
@@ -340,9 +344,11 @@
         };
 
         $scope.continueOrder = function() {
-            // Display current form data in JSON format
 
-            $scope.listOrder();
+            $("#odrConfirm").hide();
+            $("#odrForm").show();
+
+            // Display current form data in JSON format
 
             // console.log($scope.cust);
             // console.log($scope.odrList);
@@ -359,10 +365,14 @@
               console.log('mySuccess save data');
               console.log(JSON.parse(angular.toJson(response)));
               // console.log(JSON.stringify(response, null, 1));
+              
+              $scope.listOrder();
             }, function myError(response) {
               console.log('myError save data');
               console.log(JSON.stringify(response, null, 1));
             });
+
+            
 
             // Reset all model/data referred by $scope instance
             $scope.menu = {};
@@ -370,12 +380,6 @@
             $scope.odrKeys = [];
             $scope.totalPrice = 0;
             $scope.cust = {};
-
-
-            $("#odrConfirm").hide();
-            $("#odrForm").show();
-
-            $scope.listOrder();
         };
 
         $scope.cancelOrder = function() {
@@ -392,7 +396,6 @@
             params : {function:'list'}
           }).then(function mySuccess(response) {
             console.log('mySuccess list data');
-            // console.log(JSON.parse(angular.toJson(response)));
             $scope.dbcust = response.data[0];
             $scope.dborder = response.data[1];
 
@@ -402,6 +405,25 @@
             console.log('myError list data');
             console.log(JSON.parse(angular.toJson(response)));
           });
+        };
+
+        $scope.deleteOrder = function(id_customer) {
+
+          $http({
+            method : "POST",
+            url : "http://localhost/Project-Web-Tech/order.php",
+            dataType: "json",
+            params : {id_customer:id_customer,function:'delete'}
+          }).then(function mySuccess(response) {
+            console.log('mySuccess delete data');
+            console.log(JSON.parse(angular.toJson(response)));
+
+            $scope.listOrder();
+          }, function myError(response) {
+            console.log('myError delete data');
+            console.log(JSON.parse(angular.toJson(response)));
+          });
+
         };
 
 
